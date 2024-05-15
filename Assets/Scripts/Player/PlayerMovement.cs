@@ -8,10 +8,12 @@ public class PlayerMovement : MonoBehaviour
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES MOUVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float horizontal;
     public float speed;
+    public float speedDamp;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public float jumpingPower;
     public float jumpCount;
+    public bool isGrounded;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SPRITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public bool isFacingRight = true;
@@ -21,7 +23,8 @@ public class PlayerMovement : MonoBehaviour
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~REFERENCES GAMEOBJECTS ET AUTRE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public Rigidbody2D rb;
-    public Transform groundCheck;
+    public Transform groundCheck1;
+    public Transform groundCheck2;
     public LayerMask groundLayer;
 
     void Update()
@@ -32,16 +35,28 @@ public class PlayerMovement : MonoBehaviour
             horizontal = Input.GetAxisRaw("Horizontal");
             float characterVelocity = Mathf.Abs(rb.velocity.x); //convertit la valeur de la vitesse en chiffre positif pour l'animator
         }
+
+        if (Input.GetButtonUp("Horizontal"))
+        {
+            while (rb.velocity.x != 0)
+            {
+                rb.velocity = new Vector2(rb.velocity.x * speedDamp, rb.velocity.y);
+
+            }
+        }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-        if (IsGrounded())
+
+        isGrounded = Physics2D.OverlapArea(groundCheck1.position, groundCheck2.position);
+
+        if (isGrounded)
         {
             jumpCount = 0;
         }
         if (jumpCount < 1)
         {
-            if (Input.GetButtonDown("Jump") && IsGrounded())
+            if (Input.GetButtonDown("Jump") && isGrounded)
             {
-                rb.velocity = new Vector2(rb.velocity.x, jumpingPower);
+                rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
                 jumpCount += 1;
             }
 
@@ -58,13 +73,9 @@ public class PlayerMovement : MonoBehaviour
 
         if (!isDead)
         {
-            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+            rb.AddForce(Vector2.right * horizontal * speed);
+            
         }
 
-    }
-
-    private bool IsGrounded()//check si le joueur touche le sol
-    {
-        return Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
     }
 }
