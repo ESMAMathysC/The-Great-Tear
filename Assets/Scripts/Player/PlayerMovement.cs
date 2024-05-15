@@ -65,6 +65,8 @@ public class PlayerMovement : MonoBehaviour
                 rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
             }
         }
+
+        Flip();
     }
 
     private void FixedUpdate()
@@ -73,9 +75,26 @@ public class PlayerMovement : MonoBehaviour
 
         if (!isDead)
         {
-            rb.AddForce(Vector2.right * horizontal * speed);
-            
+            rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
 
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FONCTION FLIP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+    private void Flip()
+    {
+        //SI le joueur regarde vers la droite ET l'input horizontal est inférieur à 0
+        //OU le joueur ne regarde pas vers la droite ET l'input horizontal est supérieur à 0
+        //on FLIP le joueur
+        if ((isFacingRight && horizontal < 0f || !isFacingRight && horizontal > 0f))
+        {
+            //isFacingRight devient son opposé (TRUE ou FALSE)
+            //on multiplie le scale X du joueur par -1
+            isFacingRight = !isFacingRight;
+            Vector3 localScale = transform.localScale;
+            localScale.x *= -1f;
+            transform.localScale = localScale;
+        }
     }
 }
