@@ -15,6 +15,9 @@ public class PlayerMovement : MonoBehaviour
     public float jumpCount;
     public bool isGrounded;
 
+    public float baseGravityScale;
+    public float vertical;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SPRITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public bool isFacingRight = true;
 
@@ -26,6 +29,11 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck1;
     public Transform groundCheck2;
     public LayerMask groundLayer;
+
+    private void Start()
+    {
+        baseGravityScale = rb.gravityScale;
+    }
 
     void Update()
     {
@@ -66,6 +74,8 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        vertical = rb.velocity.y;
+
         Flip();
     }
 
@@ -78,7 +88,20 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+        if (Input.GetKey(KeyCode.Mouse1) && !isGrounded && vertical < 0)
+        {
+            rb.gravityScale = 0.5f;
+        }
+        else
+        {
+            rb.gravityScale = baseGravityScale;
+        }
+
     }
+
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FONCTION FLIP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
