@@ -15,8 +15,12 @@ public class PlayerMovement : MonoBehaviour
     public float jumpCount;
     public bool isGrounded;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
     public float baseGravityScale;
     public float vertical;
+    public Vector2 planeSize;
+    public Vector2 planeOffset;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SPRITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public bool isFacingRight = true;
@@ -26,8 +30,14 @@ public class PlayerMovement : MonoBehaviour
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~REFERENCES GAMEOBJECTS ET AUTRE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public Rigidbody2D rb;
-    public Transform groundCheck1;
-    public Transform groundCheck2;
+    public BoxCollider2D col;
+    public Animator anim;
+    public Vector2 standingSize;
+    public Vector2 standingOffset;
+    public GameObject groundCheck1;
+    public GameObject groundCheck2;
+    public Transform groundCheck1Pos;
+    public Transform groundCheck2Pos;
     public LayerMask groundLayer;
 
     private void Start()
@@ -54,7 +64,7 @@ public class PlayerMovement : MonoBehaviour
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
-        isGrounded = Physics2D.OverlapArea(groundCheck1.position, groundCheck2.position);
+        isGrounded = Physics2D.OverlapArea(groundCheck1Pos.position, groundCheck2Pos.position);
 
         if (isGrounded)
         {
@@ -92,11 +102,21 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Mouse1) && !isGrounded && vertical < 0)
         {
-            rb.gravityScale = 0.5f;
+            groundCheck1.SetActive(false);
+            groundCheck2.SetActive(false);
+            rb.gravityScale = 0.2f;
+            col.size = planeSize;
+            col.offset = planeOffset;
+            anim.SetBool("isGliding", true);
         }
         else
         {
+            groundCheck1.SetActive(true);
+            groundCheck2.SetActive(true);
             rb.gravityScale = baseGravityScale;
+            col.size = standingSize;
+            col.offset = standingOffset;
+            anim.SetBool("isGliding", false);
         }
 
     }
