@@ -13,12 +13,20 @@ public class PlayerMovement : MonoBehaviour
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public float jumpingPower;
     public float jumpCount;
+    public bool canJump = true;
     public bool isGrounded;
+    public bool isAirborne;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    public Vector2 crouchingSize;
+    public Vector2 crouchingOffset;
+    public bool isCrouching = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     public float baseGravityScale;
     public float vertical;
+    public bool isGliding = false;
     public Vector2 planeSize;
     public Vector2 planeOffset;
 
@@ -54,16 +62,7 @@ public class PlayerMovement : MonoBehaviour
             float characterVelocity = Mathf.Abs(rb.velocity.x); //convertit la valeur de la vitesse en chiffre positif pour l'animator
         }
 
-        if (Input.GetButtonUp("Horizontal"))
-        {
-            while (rb.velocity.x != 0)
-            {
-                rb.velocity = new Vector2(rb.velocity.x * speedDamp, rb.velocity.y);
-
-            }
-        }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
         isGrounded = Physics2D.OverlapArea(groundCheck1Pos.position, groundCheck2Pos.position);
 
         if (isGrounded)
@@ -72,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
         }
         if (jumpCount < 1)
         {
-            if (Input.GetButtonDown("Jump") && isGrounded)
+            if (Input.GetButtonDown("Jump") && isGrounded && canJump) 
             {
                 rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
                 jumpCount += 1;
@@ -87,44 +86,72 @@ public class PlayerMovement : MonoBehaviour
         vertical = rb.velocity.y;
 
         Flip();
+
+        Crouch();
+
+        Glide();
     }
 
     private void FixedUpdate()
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUVEMENT GAUCHE DROITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
         if (!isDead)
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
+
+        
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+
+    private void Crouch()
+    {
+        if (Input.GetKey(KeyCode.S) && !isGliding)
+        {
+            isCrouching = true;
+            canJump = false;
+            col.size = crouchingSize;
+            col.offset = crouchingOffset;
+            anim.SetBool("isCrouching", true);
+        }
+        else if (Input.GetKeyUp(KeyCode.S))
+        {
+            isCrouching = false;
+            canJump = true;
+            col.size = standingSize;
+            col.offset = standingOffset;
+            anim.SetBool("isCrouching", false);
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    private void Glide()
+    {
         if (Input.GetKey(KeyCode.Mouse1) && !isGrounded && vertical < 0)
         {
             groundCheck1.SetActive(false);
             groundCheck2.SetActive(false);
+            isGliding = true;
             rb.gravityScale = 0.2f;
             col.size = planeSize;
             col.offset = planeOffset;
             anim.SetBool("isGliding", true);
         }
-        else
+        else if (Input.GetKeyUp(KeyCode.Mouse1) || vertical == 0)
         {
             groundCheck1.SetActive(true);
             groundCheck2.SetActive(true);
+            isGliding = false;
             rb.gravityScale = baseGravityScale;
             col.size = standingSize;
             col.offset = standingOffset;
             anim.SetBool("isGliding", false);
         }
-
     }
 
-
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FONCTION FLIP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-
     private void Flip()
     {
         //SI le joueur regarde vers la droite ET l'input horizontal est inférieur à 0
