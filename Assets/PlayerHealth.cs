@@ -10,7 +10,7 @@ public class PlayerHealh : MonoBehaviour
     public Animator anim;
     private void OnCollisionEnter2D(Collision2D col)
     {
-        if (col.gameObject.tag == "Enemy")
+        if (col.gameObject.tag == "enemy")
         {
             hp -= 1;
         }
