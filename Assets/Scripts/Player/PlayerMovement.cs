@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES MOUVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float horizontal;
     public float speed;
-    public float speedDamp;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public float jumpingPower;
@@ -65,23 +64,32 @@ public class PlayerMovement : MonoBehaviour
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
         isGrounded = Physics2D.OverlapArea(groundCheck1Pos.position, groundCheck2Pos.position);
 
+        if (!isGrounded)
+        {
+            isAirborne = true;
+        }
+        else
+        {
+            isAirborne = false;
+        }
+
         if (isGrounded)
         {
             jumpCount = 0;
         }
-        if (jumpCount < 1)
-        {
-            if (Input.GetButtonDown("Jump") && isGrounded && canJump) 
+            if (jumpCount < 1)
             {
-                rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
-                jumpCount += 1;
-            }
+                if (Input.GetButtonDown("Jump") && isGrounded && canJump) 
+                {
+                    rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
+                    jumpCount += 1;
+                }
 
-            if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+                if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+                {
+                    rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+                }
             }
-        }
 
         vertical = rb.velocity.y;
 
@@ -99,10 +107,11 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
+        if(!isDead && isGliding && isGrounded)
+        {
+            rb.velocity = new Vector2(horizontal *0, rb.velocity.y);
 
-
-
-        
+        }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
@@ -129,21 +138,23 @@ public class PlayerMovement : MonoBehaviour
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private void Glide()
     {
-        if (Input.GetKey(KeyCode.Mouse1) && !isGrounded && vertical < 0)
+        if (Input.GetKey(KeyCode.Mouse1) && isAirborne && vertical < 0 && !isCrouching)
         {
             groundCheck1.SetActive(false);
             groundCheck2.SetActive(false);
             isGliding = true;
+            canJump = false;
             rb.gravityScale = 0.2f;
             col.size = planeSize;
             col.offset = planeOffset;
             anim.SetBool("isGliding", true);
         }
-        else if (Input.GetKeyUp(KeyCode.Mouse1) || vertical == 0)
+        else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
         {
             groundCheck1.SetActive(true);
             groundCheck2.SetActive(true);
             isGliding = false;
+            canJump = true;
             rb.gravityScale = baseGravityScale;
             col.size = standingSize;
             col.offset = standingOffset;
