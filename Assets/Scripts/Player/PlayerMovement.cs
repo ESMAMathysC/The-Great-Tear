@@ -7,46 +7,61 @@ public class PlayerMovement : MonoBehaviour
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES MOUVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float horizontal;
-    public float speed;
-    public float recoilForce;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    public float jumpingPower;
-    public float jumpCount;
-    public bool canJump = true;
-    public bool isGrounded;
-    public bool isAirborne;
+    private float jumpCount;
+    private bool canJump = true;
+    private bool isGrounded;
+    private bool isAirborne;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    public Vector2 crouchingSize;
-    public Vector2 crouchingOffset;
-    public bool isCrouching = false;
+    private bool isCrouching = false;
+    private bool forceCrouch = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    private float vertical;
+    private bool isGliding = false;
+    private int glideJumpCount = 0;
 
-    public float baseGravityScale;
-    public float vertical;
-    public bool isGliding = false;
-    public Vector2 planeSize;
-    public Vector2 planeOffset;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SPRITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    public bool isFacingRight = true;
+    private bool isFacingRight = true;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES HP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    public bool isDead = false;
+    private bool isDead = false;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~REFERENCES GAMEOBJECTS ET AUTRE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    public Rigidbody2D rb;
-    public BoxCollider2D col;
-    public Animator anim;
-    public Vector2 standingSize;
-    public Vector2 standingOffset;
-    public GameObject groundCheck1;
-    public GameObject groundCheck2;
-    public Transform groundCheck1Pos;
-    public Transform groundCheck2Pos;
-    public LayerMask groundLayer;
+    [Header("Imports")]
+
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private BoxCollider2D col;
+    [SerializeField] private CircleCollider2D circleCol;
+    [SerializeField] private Animator anim;
+    [SerializeField] private GameObject groundCheck1;
+    [SerializeField] private GameObject groundCheck2;
+    [SerializeField] private Transform groundCheck1Pos;
+    [SerializeField] private Transform groundCheck2Pos;
+    [SerializeField] private LayerMask groundLayer;
+
+    [Header("Hitbox changes")]
+    [SerializeField] private Vector2 standingSize;
+    [SerializeField] private Vector2 standingOffset;
+    [SerializeField] private Vector2 crouchingSize;
+    [SerializeField] private Vector2 crouchingOffset;
+    [SerializeField] private Vector2 planeSize;
+    [SerializeField] private Vector2 planeOffset;
+
+    [Header("Settings")]
+    public float speed;
+    [SerializeField] private float maxVelocityX;
+    [SerializeField] private float maxVelocityY;
+    [SerializeField] private float ballSpeed;
+    [SerializeField] private float angularChangeInDegrees;
+    [SerializeField] private float recoilForce;
+    [SerializeField] private float jumpingPower;
+    [SerializeField] private float jumpingPowerGlide;
+    [SerializeField] private float baseGravityScale;
+
+
 
     private void Start()
     {
@@ -63,7 +78,14 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-        isGrounded = Physics2D.OverlapArea(groundCheck1Pos.position, groundCheck2Pos.position);
+        if(Physics2D.OverlapArea(groundCheck1Pos.position, groundCheck2Pos.position) && rb.velocity.y == 0f)
+        {
+            isGrounded = true;
+        }
+        else
+        {
+            isGrounded = false;
+        }
 
         if (!isGrounded)
         {
@@ -78,19 +100,21 @@ public class PlayerMovement : MonoBehaviour
         {
             jumpCount = 0;
         }
-            if (jumpCount < 1)
+        if (jumpCount < 1)
+        {
+            if (Input.GetButtonDown("Jump") && canJump)
             {
-                if (Input.GetButtonDown("Jump") && isGrounded && canJump) 
-                {
-                    rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
-                    jumpCount += 1;
-                }
-
-                if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
-                {
-                    rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-                }
+                Debug.Log("saut pressed");
+                rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
+                jumpCount += 1;
             }
+        }
+        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
+        {
+            Debug.Log("saut lâché");
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+        }
+            
 
         vertical = rb.velocity.y;
 
@@ -105,14 +129,20 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUVEMENT GAUCHE DROITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-        if (!isDead)
+        if (!isDead && !isCrouching)
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
         }
         if(!isDead && isGliding && isGrounded)
         {
             rb.velocity = new Vector2(horizontal *0, rb.velocity.y);
-
+        }
+        if (!isDead && isCrouching)
+        {
+            var impulse = (-horizontal * ballSpeed * Mathf.Deg2Rad) * rb.inertia;
+            rb.AddTorque(impulse, ForceMode2D.Impulse);
+            /*rb.AddForce(Vector2.right*horizontal*ballSpeed);
+            rb.angularVelocity = 10f;*/
         }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -121,18 +151,23 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.S) && !isGliding)
         {
+            rb.freezeRotation = false;
+            rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 1;
             isCrouching = true;
             canJump = false;
-            col.size = crouchingSize;
-            col.offset = crouchingOffset;
+            col.enabled = false;
+            circleCol.enabled = true;
             anim.SetBool("isCrouching", true);
         }
-        else if (Input.GetKeyUp(KeyCode.S))
+        else if (Input.GetKeyUp(KeyCode.S) && !forceCrouch)
         {
+            rb.freezeRotation = true;
+            rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 0;
+            transform.rotation = Quaternion.Euler(0, 0, 0);
             isCrouching = false;
             canJump = true;
-            col.size = standingSize;
-            col.offset = standingOffset;
+            col.enabled = true;
+            circleCol.enabled = false;
             anim.SetBool("isCrouching", false);
         }
     }
@@ -151,17 +186,26 @@ public class PlayerMovement : MonoBehaviour
             col.offset = planeOffset;
             anim.SetBool("isGliding", true);
         }
+
+        if (isGliding && Input.GetButtonDown("Jump") && glideJumpCount == 0)
+        {
+            glideJumpCount += 1;
+            rb.AddForce(Vector2.up * jumpingPowerGlide, ForceMode2D.Impulse);
+        }
+
         else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
         {
             groundCheck1.SetActive(true);
             groundCheck2.SetActive(true);
             isGliding = false;
             canJump = true;
+            glideJumpCount = 0;
             rb.gravityScale = baseGravityScale;
             col.size = standingSize;
             col.offset = standingOffset;
             anim.SetBool("isGliding", false);
         }
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FONCTION FLIP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -190,6 +234,22 @@ public class PlayerMovement : MonoBehaviour
         if (collision.CompareTag("weakspot"))
         {
             rb.AddForce(Vector2.up * recoilForce, ForceMode2D.Impulse);
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if (collision.CompareTag("forceCrouch"))
+        {
+            forceCrouch = true;
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("forceCrouch"))
+        {
+            forceCrouch = false;
+            isCrouching = false;
         }
     }
 }

@@ -8,6 +8,7 @@ TagManager:
   - atk
   - enemy
   - weakspot
+  - forceCrouch
   layers:
   - Default
   - TransparentFX
