@@ -8,6 +8,7 @@ public class PlayerMovement : MonoBehaviour
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES MOUVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float horizontal;
     public float speed;
+    public float recoilForce;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public float jumpingPower;
@@ -98,6 +99,7 @@ public class PlayerMovement : MonoBehaviour
         Crouch();
 
         Glide();
+
     }
 
     private void FixedUpdate()
@@ -176,6 +178,18 @@ public class PlayerMovement : MonoBehaviour
             Vector3 localScale = transform.localScale;
             localScale.x *= -1f;
             transform.localScale = localScale;
+        }
+    }
+
+    public void Die()
+    {
+        isDead = true;
+    }
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("weakspot"))
+        {
+            rb.AddForce(Vector2.up * recoilForce, ForceMode2D.Impulse);
         }
     }
 }

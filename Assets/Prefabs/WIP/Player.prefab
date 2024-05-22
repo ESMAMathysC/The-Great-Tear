@@ -261,6 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 6
+  recoilForce: 20
   jumpingPower: 13
   jumpCount: 0
   canJump: 1
@@ -318,7 +319,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5abe7aa65d74a84299e93e6840e49e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 5
+  currentHp: 0
+  maxHp: 3
   movement: {fileID: 0}
   attack: {fileID: 0}
   anim: {fileID: 2294378921991041847}
