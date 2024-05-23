@@ -20,6 +20,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (currentHp <= 0)
         {
+            currentHp = 0;
             movement.Die();
             movement.enabled = false;
             attack.enabled = false;

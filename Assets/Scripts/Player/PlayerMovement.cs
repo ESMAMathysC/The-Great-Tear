@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES MOUVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    private float horizontal;
+    public float horizontal;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float jumpCount;
@@ -15,7 +15,7 @@ public class PlayerMovement : MonoBehaviour
     private bool isAirborne;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    private bool isCrouching = false;
+    public bool isCrouching = false;
     private bool forceCrouch = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -141,8 +141,6 @@ public class PlayerMovement : MonoBehaviour
         {
             var impulse = (-horizontal * ballSpeed * Mathf.Deg2Rad) * rb.inertia;
             rb.AddTorque(impulse, ForceMode2D.Impulse);
-            /*rb.AddForce(Vector2.right*horizontal*ballSpeed);
-            rb.angularVelocity = 10f;*/
         }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
