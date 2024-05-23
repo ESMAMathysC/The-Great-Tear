@@ -52,16 +52,12 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Settings")]
     public float speed;
-    [SerializeField] private float maxVelocityX;
-    [SerializeField] private float maxVelocityY;
+    [SerializeField] private float maxBallSpeed;
     [SerializeField] private float ballSpeed;
-    [SerializeField] private float angularChangeInDegrees;
     [SerializeField] private float recoilForce;
     [SerializeField] private float jumpingPower;
     [SerializeField] private float jumpingPowerGlide;
     [SerializeField] private float baseGravityScale;
-
-
 
     private void Start()
     {
@@ -104,17 +100,14 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Input.GetButtonDown("Jump") && canJump)
             {
-                Debug.Log("saut pressed");
                 rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
                 jumpCount += 1;
             }
         }
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
         {
-            Debug.Log("saut lâché");
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
         }
-            
 
         vertical = rb.velocity.y;
 
@@ -137,17 +130,25 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.velocity = new Vector2(horizontal *0, rb.velocity.y);
         }
-        if (!isDead && isCrouching)
+        if (!isDead && isCrouching || forceCrouch)
         {
             var impulse = (-horizontal * ballSpeed * Mathf.Deg2Rad) * rb.inertia;
             rb.AddTorque(impulse, ForceMode2D.Impulse);
+            if (rb.angularVelocity > maxBallSpeed)
+            {
+                rb.angularVelocity = maxBallSpeed;
+            }
+            if (rb.angularVelocity < -maxBallSpeed)
+            {
+                rb.angularVelocity = -maxBallSpeed;
+            }
         }
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 
     private void Crouch()
     {
-        if (Input.GetKey(KeyCode.S) && !isGliding)
+        if (Input.GetKey(KeyCode.S) && !isGliding || forceCrouch)
         {
             rb.freezeRotation = false;
             rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 1;
@@ -157,7 +158,7 @@ public class PlayerMovement : MonoBehaviour
             circleCol.enabled = true;
             anim.SetBool("isCrouching", true);
         }
-        else if (Input.GetKeyUp(KeyCode.S) && !forceCrouch)
+        else if (Input.GetKeyUp(KeyCode.S) && !forceCrouch || !forceCrouch)
         {
             rb.freezeRotation = true;
             rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 0;
@@ -179,7 +180,7 @@ public class PlayerMovement : MonoBehaviour
             groundCheck2.SetActive(false);
             isGliding = true;
             canJump = false;
-            rb.gravityScale = 0.2f;
+            rb.gravityScale = 1f;
             col.size = planeSize;
             col.offset = planeOffset;
             anim.SetBool("isGliding", true);
@@ -188,7 +189,12 @@ public class PlayerMovement : MonoBehaviour
         if (isGliding && Input.GetButtonDown("Jump") && glideJumpCount == 0)
         {
             glideJumpCount += 1;
-            rb.AddForce(Vector2.up * jumpingPowerGlide, ForceMode2D.Impulse);
+            //Vector2 dash = new Vector2(rb.velocity.x * jumpingPowerGlide, 0f);
+            //rb.velocity += dash;
+            Debug.Log("HyperVitesse !");
+            Debug.Log(new Vector2(Mathf.Sign(rb.velocity.x) * jumpingPowerGlide, 0f));
+            rb.AddForce(new Vector2(Mathf.Sign(rb.velocity.x) * jumpingPowerGlide, 0f), ForceMode2D.Impulse);
+            Debug.Log(rb.velocity.x);
         }
 
         else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
@@ -203,7 +209,6 @@ public class PlayerMovement : MonoBehaviour
             col.offset = standingOffset;
             anim.SetBool("isGliding", false);
         }
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~FONCTION FLIP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
