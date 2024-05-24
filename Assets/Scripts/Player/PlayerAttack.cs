@@ -37,5 +37,4 @@ public class PlayerAttack : MonoBehaviour
         yield return new WaitForSeconds(cooldown);
         cooldownReached = true;
     }
-
 }

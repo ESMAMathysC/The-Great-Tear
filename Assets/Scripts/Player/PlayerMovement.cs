@@ -21,7 +21,8 @@ public class PlayerMovement : MonoBehaviour
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float vertical;
     private bool isGliding = false;
-    private int glideJumpCount = 0;
+    private int glideDashCount = 0;
+    private bool wantsToDash = false;
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SPRITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -54,10 +55,14 @@ public class PlayerMovement : MonoBehaviour
     public float speed;
     [SerializeField] private float maxBallSpeed;
     [SerializeField] private float ballSpeed;
+    [SerializeField] private float boostForce;
     [SerializeField] private float recoilForce;
     [SerializeField] private float jumpingPower;
-    [SerializeField] private float jumpingPowerGlide;
+    [SerializeField] private float glideSpeed;
+    [SerializeField] private float dashGlidePower;
+    [SerializeField] private float dashGlideUpPower;
     [SerializeField] private float baseGravityScale;
+
 
     private void Start()
     {
@@ -122,14 +127,43 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MOUVEMENT GAUCHE DROITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-        if (!isDead && !isCrouching)
+        if (!isDead && !isCrouching &&!isGliding && !wantsToDash)
         {
             rb.velocity = new Vector2(horizontal * speed, rb.velocity.y);
+        }
+
+
+
+        if (!isDead && isGliding && isFacingRight)
+        {
+            rb.AddForce(Vector2.right * glideSpeed);
+        }
+        else if (!isDead && isGliding && !isFacingRight)
+        {
+            rb.AddForce(Vector2.left * glideSpeed);
+        }
+        if (wantsToDash && isFacingRight)
+        {
+            rb.AddForce(Vector2.right * dashGlidePower);
+            rb.AddForce(Vector2.up * dashGlideUpPower);
+
+            wantsToDash = false;
+        }
+        else if(wantsToDash && !isFacingRight)
+        {
+            rb.AddForce(Vector2.left * dashGlidePower);
+            rb.AddForce(Vector2.up * dashGlideUpPower);
+            wantsToDash = false;
         }
         if(!isDead && isGliding && isGrounded)
         {
             rb.velocity = new Vector2(horizontal *0, rb.velocity.y);
         }
+
+
+
+
+
         if (!isDead && isCrouching || forceCrouch)
         {
             var impulse = (-horizontal * ballSpeed * Mathf.Deg2Rad) * rb.inertia;
@@ -178,6 +212,7 @@ public class PlayerMovement : MonoBehaviour
         {
             groundCheck1.SetActive(false);
             groundCheck2.SetActive(false);
+            rb.drag = 2;
             isGliding = true;
             canJump = false;
             rb.gravityScale = 1f;
@@ -186,28 +221,29 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("isGliding", true);
         }
 
-        if (isGliding && Input.GetButtonDown("Jump") && glideJumpCount == 0)
+        if (isGliding && Input.GetButtonDown("Jump") && glideDashCount == 0)
         {
-            glideJumpCount += 1;
-            //Vector2 dash = new Vector2(rb.velocity.x * jumpingPowerGlide, 0f);
-            //rb.velocity += dash;
+            glideDashCount += 1;
+            wantsToDash = true;
             Debug.Log("HyperVitesse !");
-            Debug.Log(new Vector2(Mathf.Sign(rb.velocity.x) * jumpingPowerGlide, 0f));
-            rb.AddForce(new Vector2(Mathf.Sign(rb.velocity.x) * jumpingPowerGlide, 0f), ForceMode2D.Impulse);
-            Debug.Log(rb.velocity.x);
+
         }
 
         else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
         {
             groundCheck1.SetActive(true);
             groundCheck2.SetActive(true);
+            rb.drag = 1;
             isGliding = false;
             canJump = true;
-            glideJumpCount = 0;
             rb.gravityScale = baseGravityScale;
             col.size = standingSize;
             col.offset = standingOffset;
             anim.SetBool("isGliding", false);
+        }
+        if (isGrounded)
+        {
+            glideDashCount = 0;
         }
     }
 
@@ -231,6 +267,20 @@ public class PlayerMovement : MonoBehaviour
     public void Die()
     {
         isDead = true;
+    }
+
+    public void BallBoost()
+    {
+        if (isFacingRight)
+        {
+            rb.AddForce(Vector2.right * boostForce, ForceMode2D.Impulse);
+
+        }
+        if (!isFacingRight)
+        {
+            rb.AddForce(Vector2.left * boostForce, ForceMode2D.Impulse);
+
+        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
