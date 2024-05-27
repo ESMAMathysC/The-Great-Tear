@@ -9,6 +9,7 @@ TagManager:
   - enemy
   - weakspot
   - forceCrouch
+  - stop
   layers:
   - Default
   - TransparentFX

@@ -26,14 +26,14 @@ public class PlayerMovement : MonoBehaviour
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SPRITE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    private bool isFacingRight = true;
+    public bool isFacingRight = true;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES HP~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private bool isDead = false;
 
     [Header("Imports")]
 
-    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] public Rigidbody2D rb;
     [SerializeField] private BoxCollider2D col;
     [SerializeField] private CircleCollider2D circleCol;
     [SerializeField] private Animator anim;
@@ -267,20 +267,6 @@ public class PlayerMovement : MonoBehaviour
     public void Die()
     {
         isDead = true;
-    }
-
-    public void BallBoost()
-    {
-        if (isFacingRight)
-        {
-            rb.AddForce(Vector2.right * boostForce, ForceMode2D.Impulse);
-
-        }
-        if (!isFacingRight)
-        {
-            rb.AddForce(Vector2.left * boostForce, ForceMode2D.Impulse);
-
-        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
