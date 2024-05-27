@@ -143,7 +143,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 7
+  m_SortingOrder: 8
   m_Sprite: {fileID: 21300000, guid: 7c7be00e1e99ab1428ff76d07b8125c2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -260,28 +260,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3480225a0b5b14f46b03b8a3d3639ce1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
-  recoilForce: 20
-  jumpingPower: 13
-  jumpCount: 0
-  canJump: 1
-  isGrounded: 0
-  isAirborne: 0
-  crouchingSize: {x: 3.552062, y: 2.5394135}
-  crouchingOffset: {x: -0.3202621, y: -3.7402935}
+  horizontal: 0
   isCrouching: 0
-  baseGravityScale: 3.5
-  vertical: 0
-  isGliding: 0
-  planeSize: {x: 4.1570177, y: 2.765831}
-  planeOffset: {x: 0.00000011920929, y: -1.25}
   isFacingRight: 1
-  isDead: 0
   rb: {fileID: 1445191376947527443}
   col: {fileID: 5814576407248954072}
+  circleCol: {fileID: 0}
   anim: {fileID: 2294378921991041847}
-  standingSize: {x: 3.552062, y: 7.736817}
-  standingOffset: {x: -0.3202621, y: -1.131591}
   groundCheck1: {fileID: 1824027272399744822}
   groundCheck2: {fileID: 6051066283770092207}
   groundCheck1Pos: {fileID: 8645661085259019220}
@@ -289,6 +274,22 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  standingSize: {x: 3.552062, y: 7.736817}
+  standingOffset: {x: -0.3202621, y: -1.131591}
+  crouchingSize: {x: 3.552062, y: 2.5394135}
+  crouchingOffset: {x: -0.3202621, y: -3.7402935}
+  planeSize: {x: 4.1570177, y: 2.765831}
+  planeOffset: {x: 0.00000011920929, y: -1.25}
+  speed: 6
+  maxBallSpeed: 0
+  ballSpeed: 0
+  boostForce: 0
+  recoilForce: 20
+  jumpingPower: 13
+  glideSpeed: 0
+  dashGlidePower: 0
+  dashGlideUpPower: 0
+  baseGravityScale: 3.5
 --- !u!114 &3959828828337736820
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,9 +302,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 300cb4e9eaa285f4380be106b01ff0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMovement: {fileID: 0}
-  playerSpeed: 0
-  playerSpeedAtk: 0
+  movement: {fileID: 0}
+  isCrouching: 0
+  cooldown: 0
+  cooldownReached: 1
   atkHb: {fileID: 8713785095635308565, guid: 7c6051faa0d8840419949fd0fdb3f168, type: 3}
   lookingPoint: {fileID: 2003099204454723881}
   lookingPointPos: {x: 0, y: 0}
@@ -324,6 +326,7 @@ MonoBehaviour:
   movement: {fileID: 0}
   attack: {fileID: 0}
   anim: {fileID: 2294378921991041847}
+  checkpoint: {fileID: 0}
 --- !u!1 &6051066283770092207
 GameObject:
   m_ObjectHideFlags: 0

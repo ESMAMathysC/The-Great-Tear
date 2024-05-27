@@ -9,14 +9,6 @@ public class BirdHealth : MonoBehaviour
     public BoxCollider2D enemyHb;
     public Animator anim;
     public Rigidbody2D rb;
-
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        if (col.gameObject.tag == "atk")
-        {
-            TakeDamage();
-        }
-    }
     public void TakeDamage()
     {
         hp -= 1;
