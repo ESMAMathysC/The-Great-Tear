@@ -160,10 +160,6 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(horizontal *0, rb.velocity.y);
         }
 
-
-
-
-
         if (!isDead && isCrouching || forceCrouch)
         {
             var impulse = (-horizontal * ballSpeed * Mathf.Deg2Rad) * rb.inertia;
@@ -263,10 +259,16 @@ public class PlayerMovement : MonoBehaviour
             transform.localScale = localScale;
         }
     }
+    
+
 
     public void Die()
     {
         isDead = true;
+    }
+    public void Respawn()
+    {
+        isDead = false;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {

@@ -23,9 +23,9 @@ public class BirdHealth : MonoBehaviour
 
         if (hp <= 0)
         {
-            rb.constraints = RigidbodyConstraints2D.FreezeAll;
             enemyHb.enabled = false;
             anim.SetBool("isDead", true);
+            rb.AddForce(Vector2.up * 6, ForceMode2D.Impulse);
             Destroy(objectToDestroy, 0.5f);
         }
     }
