@@ -11,6 +11,7 @@ TagManager:
   - forceCrouch
   - stop
   - gravityTrigger
+  - detectionTrigger
   layers:
   - Default
   - TransparentFX
