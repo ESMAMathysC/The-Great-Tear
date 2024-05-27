@@ -18,7 +18,7 @@ public class EnemyBehaviour : MonoBehaviour
 
     private void Update()
     {
-        Vector2 point = currentPoint.position - transform.position; //direction dans laquelle l'nenemi veut aller
+        Vector2 point = currentPoint.position - transform.position; //direction dans laquelle l'ennemi veut aller
         if (currentPoint == pointB.transform)
         {
             rb.velocity = new Vector2(speed, 0);
