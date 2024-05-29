@@ -27,6 +27,7 @@ public class EnemyHealth : MonoBehaviour
             weakspot.SetActive(false);
             rb.constraints = RigidbodyConstraints2D.FreezeAll;
             enemyHb.enabled = false;
+            anim.SetBool("isDead", true);
             Destroy(objectToDestroy, 0.5f);
         }
     }

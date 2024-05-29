@@ -101,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
         {
             jumpCount = 0;
         }
-        if (jumpCount < 1)
+        if (jumpCount < 1 && !isGliding)
         {
             if (Input.GetButtonDown("Jump") && canJump)
             {
@@ -217,7 +217,7 @@ public class PlayerMovement : MonoBehaviour
             anim.SetBool("isGliding", true);
         }
 
-        if (isGliding && Input.GetButtonDown("Jump") && glideDashCount == 0)
+        if (isGliding && Input.GetButtonDown("Jump") && glideDashCount == 0 && isAirborne)
         {
             glideDashCount += 1;
             wantsToDash = true;
