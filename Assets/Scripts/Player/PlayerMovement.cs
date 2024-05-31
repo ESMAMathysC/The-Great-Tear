@@ -221,8 +221,6 @@ public class PlayerMovement : MonoBehaviour
         {
             glideDashCount += 1;
             wantsToDash = true;
-            Debug.Log("HyperVitesse !");
-
         }
 
         else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
