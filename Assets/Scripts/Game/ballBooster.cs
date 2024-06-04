@@ -8,6 +8,7 @@ public class ballBooster : MonoBehaviour
     public bool isFacingRight;
     public Rigidbody2D rb;
     public int boostForce;
+    public int boostForceUp;
 
     private void Start()
     {
@@ -26,5 +27,7 @@ public class ballBooster : MonoBehaviour
         {
             rb.AddForce(Vector2.left * boostForce, ForceMode2D.Impulse);
         }
+
+        rb.AddForce(Vector2.up * boostForceUp, ForceMode2D.Impulse);
     }
 }

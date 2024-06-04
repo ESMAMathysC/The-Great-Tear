@@ -101,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
         {
             jumpCount = 0;
         }
-        if (jumpCount < 1 && !isGliding)
+        if (jumpCount < 1 && !isGliding && isGrounded)
         {
             if (Input.GetButtonDown("Jump") && canJump)
             {

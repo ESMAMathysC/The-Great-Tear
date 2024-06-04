@@ -62,7 +62,7 @@ Transform:
   m_GameObject: {fileID: 4599462214067807355}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -17.64, y: -0.03, z: -0.05342201}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.7702, y: 0.7702, z: 0.7702}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -227,7 +227,7 @@ MonoBehaviour:
   enemyProjectileprefab: {fileID: 2597770934756829360, guid: f5b5032a24957c74585bc431ae45f2f5, type: 3}
   projectileSpawnPoint: {fileID: 3393384945284439395}
   cooldownReached: 1
-  cooldown: 1
+  cooldown: 1.3
 --- !u!95 &6417942147640104872
 Animator:
   serializedVersion: 5
@@ -274,7 +274,7 @@ Transform:
   m_GameObject: {fileID: 6901781028194188956}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -654.32, y: -10.25, z: 0.088366}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1.6541, y: 1.6541, z: 1.6541}
   m_ConstrainProportionsScale: 0
   m_Children:
