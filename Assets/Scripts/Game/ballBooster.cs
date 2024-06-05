@@ -5,7 +5,7 @@ using UnityEngine;
 public class ballBooster : MonoBehaviour
 {
     public PlayerMovement movement;
-    public bool isFacingRight;
+    public bool isCrouching;
     public Rigidbody2D rb;
     public int boostForce;
     public int boostForceUp;
@@ -13,21 +13,22 @@ public class ballBooster : MonoBehaviour
     private void Start()
     {
         movement = FindObjectOfType<PlayerMovement>();
-        isFacingRight = movement.isFacingRight;
         rb = movement.rb;
+    }
+
+    private void Update()
+    {
+        isCrouching = movement.isCrouching;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (isFacingRight)
+        if (isCrouching)
         {
             rb.AddForce(Vector2.right * boostForce, ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * boostForceUp, ForceMode2D.Impulse);
 
         }
-        if (!isFacingRight)
-        {
-            rb.AddForce(Vector2.left * boostForce, ForceMode2D.Impulse);
-        }
 
-        rb.AddForce(Vector2.up * boostForceUp, ForceMode2D.Impulse);
+
     }
 }

@@ -282,7 +282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7cc53f49d93880745acc2cbe644ff01f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 3
+  hp: 1
   objectToDestroy: {fileID: 3709106756161459522}
   enemyHb: {fileID: 3178105238367570711}
   anim: {fileID: 3285364877500291686}

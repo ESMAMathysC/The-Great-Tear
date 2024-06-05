@@ -12,6 +12,7 @@ TagManager:
   - stop
   - gravityTrigger
   - detectionTrigger
+  - bird
   layers:
   - Default
   - TransparentFX
