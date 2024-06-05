@@ -48,6 +48,6 @@ public class PlayerHealth : MonoBehaviour
         movement.enabled = true;
         attack.enabled = true;
         anim.SetBool("isDead", false);
-        checkpoint.OnPlayerDeath();
+        movement.OnPlayerDeath();
     }
 }

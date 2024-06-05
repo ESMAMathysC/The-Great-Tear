@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES MOUVEMENT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public float horizontal;
+    public Vector2 respawnCoordinates;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private float jumpCount;
@@ -15,10 +16,12 @@ public class PlayerMovement : MonoBehaviour
     private bool isAirborne;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    public bool hasCrouchPower = false;
     public bool isCrouching = false;
     private bool forceCrouch = false;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    public bool hasPlanePower = false;
     private float vertical;
     private bool isGliding = false;
     private int glideDashCount = 0;
@@ -53,6 +56,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Settings")]
     public float speed;
+    [SerializeField] public float coinCount;
     [SerializeField] private float maxBallSpeed;
     [SerializeField] private float ballSpeed;
     [SerializeField] private float boostForce;
@@ -179,66 +183,73 @@ public class PlayerMovement : MonoBehaviour
 
     private void Crouch()
     {
-        if (Input.GetKey(KeyCode.S) && !isGliding || forceCrouch)
+        if (hasCrouchPower)
         {
-            rb.freezeRotation = false;
-            rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 1;
-            isCrouching = true;
-            canJump = false;
-            col.enabled = false;
-            circleCol.enabled = true;
-            anim.SetBool("isCrouching", true);
+            if (Input.GetKey(KeyCode.S) && !isGliding || forceCrouch)
+            {
+                rb.freezeRotation = false;
+                rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 1;
+                isCrouching = true;
+                canJump = false;
+                col.enabled = false;
+                circleCol.enabled = true;
+                anim.SetBool("isCrouching", true);
+            }
+            else if (Input.GetKeyUp(KeyCode.S) && !forceCrouch || !forceCrouch)
+            {
+                rb.freezeRotation = true;
+                rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 0;
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+                isCrouching = false;
+                canJump = true;
+                col.enabled = true;
+                circleCol.enabled = false;
+                anim.SetBool("isCrouching", false);
+            }
         }
-        else if (Input.GetKeyUp(KeyCode.S) && !forceCrouch || !forceCrouch)
-        {
-            rb.freezeRotation = true;
-            rb.GetComponent<Rigidbody2D>().sharedMaterial.friction = 0;
-            transform.rotation = Quaternion.Euler(0, 0, 0);
-            isCrouching = false;
-            canJump = true;
-            col.enabled = true;
-            circleCol.enabled = false;
-            anim.SetBool("isCrouching", false);
-        }
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GLIDE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     private void Glide()
     {
-        if (Input.GetKey(KeyCode.Mouse1) && isAirborne && vertical < 0 && !isCrouching)
+        if (hasPlanePower)
         {
-            groundCheck1.SetActive(false);
-            groundCheck2.SetActive(false);
-            rb.drag = 2;
-            isGliding = true;
-            canJump = false;
-            rb.gravityScale = 1f;
-            col.size = planeSize;
-            col.offset = planeOffset;
-            anim.SetBool("isGliding", true);
-        }
+            if (Input.GetKey(KeyCode.Mouse1) && isAirborne && vertical < 0 && !isCrouching)
+            {
+                groundCheck1.SetActive(false);
+                groundCheck2.SetActive(false);
+                rb.drag = 2;
+                isGliding = true;
+                canJump = false;
+                rb.gravityScale = 1f;
+                col.size = planeSize;
+                col.offset = planeOffset;
+                anim.SetBool("isGliding", true);
+            }
 
-        if (isGliding && Input.GetButtonDown("Jump") && glideDashCount == 0 && isAirborne)
-        {
-            glideDashCount += 1;
-            wantsToDash = true;
-        }
+            if (isGliding && Input.GetButtonDown("Jump") && glideDashCount == 0 && isAirborne)
+            {
+                glideDashCount += 1;
+                wantsToDash = true;
+            }
 
-        else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
-        {
-            groundCheck1.SetActive(true);
-            groundCheck2.SetActive(true);
-            rb.drag = 1;
-            isGliding = false;
-            canJump = true;
-            rb.gravityScale = baseGravityScale;
-            col.size = standingSize;
-            col.offset = standingOffset;
-            anim.SetBool("isGliding", false);
-        }
-        if (isGrounded)
-        {
-            glideDashCount = 0;
+            else if (Input.GetKeyUp(KeyCode.Mouse1) || Input.GetKeyUp(KeyCode.Mouse1) && !isAirborne && vertical == 0)
+            {
+                groundCheck1.SetActive(true);
+                groundCheck2.SetActive(true);
+                rb.drag = 1;
+                isGliding = false;
+                canJump = true;
+                rb.gravityScale = baseGravityScale;
+                col.size = standingSize;
+                col.offset = standingOffset;
+                anim.SetBool("isGliding", false);
+            }
+            if (isGrounded)
+            {
+                glideDashCount = 0;
+            }
         }
     }
 
@@ -265,9 +276,27 @@ public class PlayerMovement : MonoBehaviour
     {
         isDead = true;
     }
+
+    public void OnPlayerDeath()
+    {
+        transform.position = respawnCoordinates;
+    }
     public void Respawn()
     {
         isDead = false;
+    }
+    public void GetCrouch()
+    {
+        hasCrouchPower = true;
+    }
+    public void GetPlane()
+    {
+        hasPlanePower = true;
+    }
+
+    public void GetCoin()
+    {
+        coinCount += 1;
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
