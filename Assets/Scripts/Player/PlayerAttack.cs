@@ -6,10 +6,11 @@ public class PlayerAttack : MonoBehaviour
 {
     public PlayerMovement movement;
     public bool isCrouching;
-    public int cooldown;
+    public float cooldown;
     public bool cooldownReached = true;
 
     public GameObject atkHb;
+    public Animator anim;
 
     public GameObject lookingPoint;
     public Vector2 lookingPointPos;
@@ -26,6 +27,7 @@ public class PlayerAttack : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Mouse0) && cooldownReached && !isCrouching)
         {
+            StartCoroutine(Animation());
             StartCoroutine(Attack());
         }
     }
@@ -36,5 +38,12 @@ public class PlayerAttack : MonoBehaviour
         GameObject atk = Instantiate(atkHb, lookingPointPos, Quaternion.identity);
         yield return new WaitForSeconds(cooldown);
         cooldownReached = true;
+    }
+
+    IEnumerator Animation()
+    {
+        anim.SetBool("isAttacking", true);
+        yield return new WaitForSeconds(0.45f);
+        anim.SetBool("isAttacking", false);
     }
 }
