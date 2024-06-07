@@ -7,6 +7,7 @@ public class BirdBehaviour : MonoBehaviour
     public GameObject pointA;
     public GameObject pointB;
     public Rigidbody2D rb;
+    public Animator anim;
     public Transform currentPoint;
     public float speed;
 
@@ -89,11 +90,13 @@ public class BirdBehaviour : MonoBehaviour
     IEnumerator Dive()
     {
         isDiving = true;
+        anim.SetBool("isDiving", true);
         rb.constraints = RigidbodyConstraints2D.None;
         rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
         rb.gravityScale = 3;
         yield return new WaitForSeconds(groundedTime);
         rb.gravityScale = 2;
+        anim.SetBool("isDiving", false);
         rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
     }
 }
