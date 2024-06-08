@@ -13,6 +13,8 @@ TagManager:
   - gravityTrigger
   - detectionTrigger
   - bird
+  - oneShot
+  - endScreen
   layers:
   - Default
   - TransparentFX

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Imports")]
 
     [SerializeField] public Rigidbody2D rb;
+    public PlayerHealth hp;
     [SerializeField] private BoxCollider2D col;
     [SerializeField] private CircleCollider2D circleCol;
     [SerializeField] private Animator anim;
@@ -81,6 +83,8 @@ public class PlayerMovement : MonoBehaviour
             horizontal = Input.GetAxisRaw("Horizontal");
             float characterVelocity = Mathf.Abs(rb.velocity.x); //convertit la valeur de la vitesse en chiffre positif pour l'animator
             anim.SetFloat("speed", characterVelocity);
+
+
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SAUT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
@@ -120,6 +124,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
         vertical = rb.velocity.y;
+        float characterVerticalVelocity = Mathf.Abs(rb.velocity.y);
+        anim.SetFloat("verticalSpeed", characterVerticalVelocity);
 
         Flip();
 
@@ -127,6 +133,39 @@ public class PlayerMovement : MonoBehaviour
 
         Glide();
 
+        if (Input.GetKey(KeyCode.Alpha1))
+        {
+            transform.position = new Vector2(-253, -128);
+        }
+        if (Input.GetKey(KeyCode.Alpha2))
+        {
+            transform.position = new Vector2(-147, -142);
+        }
+        if (Input.GetKey(KeyCode.Alpha3))
+        {
+            transform.position = new Vector2(-165, -122);
+        }
+        if (Input.GetKey(KeyCode.Alpha4))
+        {
+            transform.position = new Vector2(-148, -54);
+        }
+        if (Input.GetKey(KeyCode.Alpha5))
+        {
+            transform.position = new Vector2(-336, -97);
+        }
+        if (Input.GetKey(KeyCode.Alpha6))
+        {
+            transform.position = new Vector2(-373, -13);
+        }
+        if (Input.GetKey(KeyCode.Alpha7))
+        {
+            transform.position = new Vector2(-292, 77);
+        }
+        if (Input.GetKey(KeyCode.Alpha0))
+        {
+            hasCrouchPower = true;
+            hasPlanePower = true;
+        }
     }
 
     private void FixedUpdate()
@@ -321,4 +360,6 @@ public class PlayerMovement : MonoBehaviour
             isCrouching = false;
         }
     }
+
+
 }

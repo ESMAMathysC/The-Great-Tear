@@ -25,14 +25,19 @@ public class PlayerHealth : MonoBehaviour
             StartCoroutine(RespawnTimer());
         }
     }
-
-    public void OneShot()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        currentHp = 0;
-        movement.Die();
-        movement.enabled = false;
-        attack.enabled = false;
-        anim.SetBool("isDead", true);
+        if (collision.CompareTag("oneShot"))
+        {
+            OneShot();
+        }
+    }
+
+
+
+public void OneShot()
+    {
+        StartCoroutine(RespawnTimer());
     }
 
     IEnumerator RespawnTimer()
@@ -42,7 +47,7 @@ public class PlayerHealth : MonoBehaviour
         movement.enabled = false;
         attack.enabled = false;
         anim.SetBool("isDead", true);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
         currentHp = maxHp;
         movement.Respawn();
         movement.enabled = true;

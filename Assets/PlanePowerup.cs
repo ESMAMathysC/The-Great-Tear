@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlanePowerup : MonoBehaviour
 {
     public PlayerMovement getPlanePower;
+    public GameObject dialogue;
+
     public void Start()
     {
         getPlanePower = GameObject.FindObjectOfType<PlayerMovement>();
@@ -15,6 +17,7 @@ public class PlanePowerup : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             collision.gameObject.GetComponent<PlayerMovement>().GetPlane();
+            dialogue.SetActive(true);
             Destroy(this.gameObject);
         }
     }
