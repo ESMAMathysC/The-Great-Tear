@@ -166,6 +166,10 @@ public class PlayerMovement : MonoBehaviour
             hasCrouchPower = true;
             hasPlanePower = true;
         }
+        if (Input.GetKey(KeyCode.Backspace))
+        {
+            SceneManager.LoadScene(0);
+        }
     }
 
     private void FixedUpdate()
