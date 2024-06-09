@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     private bool canJump = true;
     private bool isGrounded;
     private bool isAirborne;
+    private bool isJumping;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~VARIABLES CROUCH~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     public bool hasCrouchPower = false;
@@ -108,14 +109,18 @@ public class PlayerMovement : MonoBehaviour
 
         if (isGrounded)
         {
+            anim.SetBool("isJumping", false);
+            isJumping = false;
             jumpCount = 0;
         }
         if (jumpCount < 1 && !isGliding && isGrounded)
         {
             if (Input.GetButtonDown("Jump") && canJump)
             {
+                isJumping = true;
                 rb.AddForce(Vector2.up * jumpingPower, ForceMode2D.Impulse);
                 jumpCount += 1;
+                anim.SetBool("isJumping", true);
             }
         }
         if (Input.GetButtonUp("Jump") && rb.velocity.y > 0f)
@@ -124,14 +129,22 @@ public class PlayerMovement : MonoBehaviour
         }
 
         vertical = rb.velocity.y;
-        float characterVerticalVelocity = Mathf.Abs(rb.velocity.y);
-        anim.SetFloat("verticalSpeed", characterVerticalVelocity);
+
 
         Flip();
 
         Crouch();
 
         Glide();
+
+        if (!isGrounded && !isJumping)
+        {
+            anim.SetBool("isFalling", true);
+        }
+        if (isGrounded)
+        {
+            anim.SetBool("isFalling", false);
+        }
 
         if (Input.GetKey(KeyCode.Alpha1))
         {
